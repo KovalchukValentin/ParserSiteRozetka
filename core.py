@@ -1,47 +1,56 @@
-
-
 import requests
 from bs4 import BeautifulSoup
 
 
-def get_max_page(links: list) -> int:
-    num_of_page = 1
-    for link in links:
-        if is_bed_link(link):
-            continue
-        if (len(link.get('href').split('/')) > 4
-                and link.get('href').split('/')[4].split('=')[0] == 'page'):
-            num_of_page = link.text
-    return int(num_of_page)
+class Parcer:
+    def __init__(self, url):
+        self.response = self.get_work_response(url)
+        self.links = self.get_all_links(self.response)
+        self.max_page = self.get_max_page(links=self.links)
 
+    def get_work_response(self, url) -> requests.Response:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response
+        else:
+            print('Failed to retrieve the webpage. Status code:', response.status_code)
+            exit()
 
-def is_bed_link(link):
-    return not link.text or not link.get('href')
+    def get_all_links(self, response) -> list:
+        html_content = response.text
+        soup = BeautifulSoup(html_content, 'html.parser')
+        return soup.find_all('a')
 
+    def get_max_page(self, links: list) -> int:
+        num_of_page = 1
+        for link in links:
+            if self.is_bed_link(link):
+                continue
+            if (len(link.get('href').split('/')) > 4
+                    and link.get('href').split('/')[4].split('=')[0] == 'page'):
+                num_of_page = link.text
+        return int(num_of_page)
 
+    def is_bed_link(self, link) -> bool:
+        return not link.text or not link.get('href')
 
-url = 'https://rozetka.com.ua/ua/mobile-phones/c80003/'
-response = requests.get(url)
+    def get_all_models_of_mobile(self) -> list:
+        return self._get_all_models_of_mobile(self.links)
 
-if response.status_code == 200:
-    html_content = response.text
-    soup = BeautifulSoup(html_content, 'html.parser')
-    links = soup.find_all('a')
-    pages = soup.find_all('page=')
-    max_page = get_max_page(links=links)
-
-    for link in links:
-
-        '''print('Text:', link.text)
-        print('URL:', link.get('href').split('/'))'''
-        '''if (link.text.split()[0] == "Мобільний"):
-            print('Text:', link.text)
-            print('URL:', link.get('href'))'''
-
-else:
-    print('Failed to retrieve the webpage. Status code:', response.status_code)
-    exit()
-
-
-
-
+    def _get_all_models_of_mobile(self, links) -> list:
+        models_of_mobile = []
+        flag_top = 2
+        for link in links:
+            if self.is_bed_link(link):
+                continue
+            if link.get('href')[0] == '/' or link.text[1].isnumeric():
+                continue
+            if flag_top:
+                if flag_top == 1:
+                    flag_top -= 1
+                elif link.get('href') == 'https://rozetka.com.ua/ua/':
+                    flag_top -= 1
+                continue
+            if link.get('href') == 'https://rozetka.com.ua/ua/contacts/':
+                return models_of_mobile
+            models_of_mobile.append(link)
