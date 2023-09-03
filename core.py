@@ -27,7 +27,7 @@ class Parcer:
         return soup.find_all('a')
 
     def get_max_page(self) -> int:
-        return int(self._get_all_a_with_class(class_="pagination__link ng-star-inserted")[-1].text)
+        return int(self._get_all_tag_with_class(tag="a", class_="pagination__link ng-star-inserted")[-1].text)
 
     def get_all_link_tiles_from_first_pages(self, pages=10) -> list:
         if pages >= self.max_page:
@@ -38,12 +38,12 @@ class Parcer:
             print(f"Done: {round(current_page/pages*100)}%")
             current_url = self.url + f"page={current_page}"
             self._change_response(current_url)
-            result += self._get_all_a_with_class(class_="goods-tile__heading ng-star-inserted")
+            result += self._get_all_tag_with_class(tag="a", class_="goods-tile__heading ng-star-inserted")
             current_page += 1
         return result
 
-    def _get_all_a_with_class(self, class_):
+    def _get_all_tag_with_class(self, tag:str, class_:str) -> list:
         html_content = self.response.text
         soup = BeautifulSoup(html_content, 'html.parser')
-        return soup.find_all("a", class_=class_)
+        return soup.find_all(tag, class_=class_)
 
