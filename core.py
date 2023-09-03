@@ -6,7 +6,7 @@ class Parcer:
     def __init__(self, url):
         self.response = self.get_work_response(url)
         self.links = self.get_all_links()
-        self.max_page = self.get_max_page(links=self.links)
+        self.max_page = self.get_max_page()
 
     def get_work_response(self, url) -> requests.Response:
         response = requests.get(url)
@@ -21,15 +21,8 @@ class Parcer:
         soup = BeautifulSoup(html_content, 'html.parser')
         return soup.find_all('a')
 
-    def get_max_page(self, links: list) -> int:
-        num_of_page = 1
-        for link in links:
-            if self.is_bed_link(link):
-                continue
-            if (len(link.get('href').split('/')) > 4
-                    and link.get('href').split('/')[4].split('=')[0] == 'page'):
-                num_of_page = link.text
-        return int(num_of_page)
+    def get_max_page(self) -> int:
+        return int(self._get_all_a_with_class(class_="pagination__link ng-star-inserted")[-1].text)
 
     def is_bed_link(self, link) -> bool:
         return not link.text or not link.get('href')
