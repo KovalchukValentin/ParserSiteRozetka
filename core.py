@@ -29,18 +29,22 @@ class Parcer:
     def get_max_page(self) -> int:
         return int(self._get_all_tag_with_class(tag="a", class_="pagination__link ng-star-inserted")[-1].text)
 
-    def get_all_link_tiles_from_first_pages(self, pages=10) -> list:
+    def get_all_link_tiles_from_first_pages(self, pages=10):
+        for result in self._get_all_tag_with_class_from_first_pages(tag="a",
+                                                            class_="goods-tile__heading ng-star-inserted",
+                                                            pages=pages):
+            yield result
+
+    def _get_all_tag_with_class_from_first_pages(self, tag, class_, pages) -> list:
         if pages >= self.max_page:
             pages = self.max_page
-        result = []
         current_page = 1
         while current_page <= pages:
-            print(f"Done: {round(current_page/pages*100)}%")
             current_url = self.url + f"page={current_page}"
             self._change_response(current_url)
-            result += self._get_all_tag_with_class(tag="a", class_="goods-tile__heading ng-star-inserted")
+            yield self._get_all_tag_with_class(tag=tag, class_=class_)
             current_page += 1
-        return result
+            print(f"Done: {round(current_page / pages * 100)}%")
 
     def _get_all_tag_with_class(self, tag:str, class_:str) -> list:
         html_content = self.response.text
