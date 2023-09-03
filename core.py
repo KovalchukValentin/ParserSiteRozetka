@@ -16,8 +16,7 @@ class Parcer:
         if response.status_code == 200:
             return response
         else:
-            print('Failed to retrieve the webpage. Status code:', response.status_code)
-            exit()
+            raise ValueError(f"Response error code {response.status_code}")
 
     def get_all_links(self) -> list:
         html_content = self.response.text
