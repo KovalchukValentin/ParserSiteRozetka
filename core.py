@@ -29,14 +29,14 @@ class Parcer:
 
     def get_all_link_tiles_from_first_pages(self, pages=10) -> list:
         for result in self._get_all_tag_with_class_from_first_pages(tag="a",
-                                                            class_="goods-tile__heading ng-star-inserted",
-                                                            pages=pages):
+                                                                    class_="goods-tile__heading ng-star-inserted",
+                                                                    pages=pages):
             yield result
 
     def get_all_values_from_first_pages_in_int_list(self, pages=10) -> list:
         for result in self._get_all_tag_with_class_from_first_pages(tag="span",
-                                                            class_="goods-tile__price-value",
-                                                            pages=pages):
+                                                                    class_="goods-tile__price-value",
+                                                                    pages=pages):
             int_result = []
             for value in result:
                 int_result.append(self.convert_value_from_site_to_int(value=value.text))
@@ -56,7 +56,7 @@ class Parcer:
             print(f"Done: {round(current_page / pages * 100)}%")
             current_page += 1
 
-    def _get_all_tag_with_class(self, tag:str, class_:str) -> list:
+    def _get_all_tag_with_class(self, tag: str, class_: str) -> list:
         html_content = self.response.text
         soup = BeautifulSoup(html_content, 'html.parser')
         return soup.find_all(tag, class_=class_)
