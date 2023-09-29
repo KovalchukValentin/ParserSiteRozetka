@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QToolBar, QLabel
 
 from core import Parcer
 
-
 class CustomToolbar(QToolBar):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -55,18 +54,18 @@ class CustomToolbar(QToolBar):
     def press_parce(self):
         try:
             parser = Parcer(url=self.entry_link.text())
-        except ValueError as e:
+        except Exception as e:
             self.label_error.setText(str(e))
             return
-        for result in parser.get_all_link_tiles_from_first_pages(2):
-            for link in result:
+
+        for results in parser.get_all_tag_with_class(tag=self.entry_tag.text(), class_=self.entry_class.text()):
+            for link in results:
                 self.parent.text_edit.append(f'{link.text}\n')
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-
         self.initUI()
 
     def initUI(self):
@@ -123,7 +122,3 @@ def main():
     main_window = MainWindow()
     main_window.show()
     sys.exit(app.exec_())
-
-
-if __name__ == "__main__":
-    main()
